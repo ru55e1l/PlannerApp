@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import { SafeAreaView, TouchableOpacity, View, Text, StyleSheet, TextInput,Keyboard} from 'react-native';
-import {CalendarList, Agenda} from 'react-native-calendars';
+import {CalendarList, Agenda, CalendarProvider} from 'react-native-calendars';
 import {Card, Avatar} from 'react-native-paper';
+import dateFns from 'date-fns';
 
 
 
@@ -78,22 +79,23 @@ export default function CalendarScreen({ navigation }) {
             [day.dateString]: [{ text: event }],
         }));
     };
-
     return (
         <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
-            <Agenda
-                onDayPress={onDayPress}
-                theme={calendarTheme}
-                items={items}
-                loadItemsForMonth={loadItems}
-                renderItem={renderItem}
-                renderEmptyDate={() => (
-                    <View style={styles.emptyDate}>
-                        <Text>No items for this date</Text>
-                    </View>
-                )}
+            <CalendarProvider date={''}>
+                <Agenda
+                    onDayPress={onDayPress}
+                    theme={calendarTheme}
+                    items={items}
+                    loadItemsForMonth={loadItems}
+                    renderItem={renderItem}
+                    renderEmptyDate={() => (
+                        <View style={styles.emptyDate}>
+                            <Text>No items for this date</Text>
+                        </View>
+                    )}
 
-            />
+                />
+            </CalendarProvider>
         </SafeAreaView>
     );
 }
