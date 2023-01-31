@@ -1,101 +1,73 @@
-import React, {useState, useEffect} from 'react';
-import { SafeAreaView, TouchableOpacity, View, Text, StyleSheet, TextInput,Keyboard} from 'react-native';
-import {CalendarList, Agenda, CalendarProvider} from 'react-native-calendars';
-import {Card, Avatar} from 'react-native-paper';
-import dateFns from 'date-fns';
-
+import React, { useState } from 'react';
+import { CalendarList, CalendarProvider } from 'react-native-calendars';
+import colors from '../../components/colors';
+import {SafeAreaView, StyleSheet} from "react-native";
+import RoundIconBtn from "../../components/RoundIconBtn";
 
 
 const calendarTheme = {
-    calendarBackground: '#000000',
-
-    selectedDayBackgroundColor: '#ffffff',
+    calendarBackground: colors.background,
     selectedDayTextColor: '#191919',
-    selectedDotColor: '#ffffff',
-
-    dayTextColor: '#ffffff',
-    textDisabledColor: '#ffffff',
-    dotColor: '#DBE9EE',
-
-    monthTextColor: '#DBE9EE',
+    selectedDotColor: colors.backgroundOpposite,
+    dayTextColor: colors.backgroundOpposite,
+    textDisabledColor: colors.backgroundOpposite,
+    dotColor: colors.textColor,
+    monthTextColor: colors.textColor,
     textMonthFontWeight: 'bold',
-
-    arrowColor: '#DBE9EE',
+    arrowColor: colors.textColor,
 }
-const timeToString = (time) => {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-};
+
+
 
 export default function CalendarScreen({ navigation }) {
-    const [items, setItems] = React.useState({});
-    const [event, setEvent] = React.useState('');
-    const loadItems = (day) => {
-        setTimeout(() => {
-            for (let i = -15; i < 85; i++) {
-                const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-                const strTime = timeToString(time);
-                if (!items[strTime]) {
-                    items[strTime] = [];
-                    const numItems = Math.floor(Math.random() * 3 + 1);
-                    for (let j = 0; j < numItems; j++) {
-                        items[strTime].push({
-                            name: 'Item for ' + strTime + ' #' + j,
-                            height: Math.max(50, Math.floor(Math.random() * 150)),
-                        });
-                    }
-                }
-            }
-            const newItems = {};
-            Object.keys(items).forEach((key) => {
-                newItems[key] = items[key];
-            });
-            setItems(newItems);
-        }, 1000);
-    };
-    const renderItem = (item) => {
-        return (
-            <TouchableOpacity style={{marginRight: 10, marginTop: 17}}>
-                <Card>
-                    <Card.Content>
-                        <View
-                            style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                            }}>
-                            <Text>{item.name}</Text>
-                            <Avatar.Text label="RT" />
-                        </View>
-                    </Card.Content>
-                </Card>
-            </TouchableOpacity>
-        );
-    };
-    const onDayPress = (day) => {
-        Keyboard.dismiss();
-        setItems((items) => ({
-            ...items,
-            [day.dateString]: [{ text: event }],
-        }));
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    const markedDates = {
+        [selectedDate]: { selected: true },
     };
     return (
-        <SafeAreaView style={{ flex: 1, justifyContent: 'center' }}>
+        <SafeAreaView style={styles.container}>
+            <RoundIconBtn
+                antIconName='plus'
+                style={styles.addBtn}
+                onPress={() => console.log('open calendar modal')}
+            />
             <CalendarProvider date={''}>
-                <Agenda
-                    onDayPress={onDayPress}
+                <CalendarList
                     theme={calendarTheme}
-                    items={items}
-                    loadItemsForMonth={loadItems}
-                    renderItem={renderItem}
-                    renderEmptyDate={() => (
-                        <View style={styles.emptyDate}>
-                            <Text>No items for this date</Text>
-                        </View>
-                    )}
-
+                    markedDates={markedDates}
+                    onDayPress={day => {
+                        navigation.navigate('SelectedDateScreen');
+                        setSelectedDate(day.dateString);
+                        console.log('selected day', day);
+                    }}
+                    onDayLongPress={day => {
+                        setSelectedDate(day.dateString);
+                        console.log('selected day', day);
+                    }}
                 />
             </CalendarProvider>
         </SafeAreaView>
+
     );
 }
+const styles = StyleSheet.create({
+    container: {
+        paddingHorizontal: 20,
+        flex: 1,
+    },
+    header: {
+        color: colors.textColor,
+        fontSize: 30,
+        paddingLeft: 10,
+        fontWeight: 'bold',
+        zIndex: 0,
+        flex: 0,
+    },
+    addBtn: {
+        position: 'absolute',
+        right: 0,
+        top: 40,
+        zIndex: 3,
+    }
+});

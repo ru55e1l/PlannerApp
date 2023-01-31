@@ -1,59 +1,58 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, AsyncStorageStatic } from 'react-native';
+import { SafeAreaView, View, StyleSheet, Text, StatusBar } from 'react-native';
+import colors from '../../components/colors'
+import RoundIconBtn from '../../components/RoundIconBtn';
+import Searchbar from '../../components/Searchbar';
 
 
-export default function NotesScreen({ navigation }) {
-    const [notes, setNotes] = useState([]);
-    const [newNote, setNewNote] = useState('');
-
-    const saveNote = async () => {
-        try {
-            // Save the new note to AsyncStorageStatic
-            await AsyncStorageStatic.setItem('@MyNotes:note', newNote);
-            // Retrieve all the notes from AsyncStorageStatic
-            const savedNotes = await AsyncStorageStatic.getItem('@MyNotes:note');
-            // Add the new note to the array of notes
-            setNotes([...notes, savedNotes]);
-            // Clear the input field
-            setNewNote('');
-        } catch (e) {
-            // Handle errors
-        }
-    };
-
+const NoteScreen = () => {
     return (
-        <View style={styles.container}>
-            <TextInput
-                style={styles.input}
-                value={newNote}
-                onChangeText={setNewNote}
-                placeholder="Enter a new note"
-            />
-            <Button title="Save" onPress={saveNote} />
-            <Text style={styles.header}>Saved Notes:</Text>
-            {notes.map((note, index) => (
-                <Text key={index}>{note}</Text>
-            ))}
-        </View>
+        <>
+        <SafeAreaView style={styles.container}>
+                <RoundIconBtn
+                    antIconName='plus'
+                    style={styles.addBtn}
+                    onPress={() => console.log('open notes modal')}
+                />
+                <Text style={styles.header}>Notes</Text>
+                <Searchbar containerStyle={{ marginVertical: 25 }} />
+                <View style={[StyleSheet.absoluteFillObject, styles.emptyHeaderContainer]}>
+                    <Text style={styles.emptyHeader}>ADD NOTES</Text>
+                </View>
+        </SafeAreaView>
+        </>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
+        paddingHorizontal: 20,
         flex: 1,
-        backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    input: {
-        width: '80%',
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 10
     },
     header: {
-        fontSize: 20,
-        marginTop: 20
+        color: colors.textColor,
+        fontSize: 30,
+        paddingLeft: 10,
+        fontWeight: 'bold',
+        zIndex: 0,
+        flex: 0,
+    },
+    emptyHeader: {
+        fontSize: 35,
+        color: colors.textColor,
+        opacity: 0.3,
+        fontWeight: 'bold',
+    },
+    emptyHeaderContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: -1,
+    },
+    addBtn: {
+        position: 'absolute',
+        right: 0,
+        top: 40,
+        zIndex: 3,
     }
 });
+export default NoteScreen;
